@@ -12,3 +12,7 @@ REST の基本的な考え方は、リソース、たとえば文書が、明確
 https://www.postman.com/downloads/
 
 試しに weather-app でデプロイした heroku のエンドポイントにアクセスする
+
+
+#### HTTP STATUS 
+

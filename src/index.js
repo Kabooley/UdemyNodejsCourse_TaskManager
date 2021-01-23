@@ -27,25 +27,12 @@ app.post("/users", async (req, res) => {
 app.post("/tasks", async (req, res) => {
   const newTask = new Task(req.body);
 
-  //   async/awaitだと最終的なreturn分に行きつくまでにエラーが起こると
-  // そこで処理が中断してエラーを返す
-  // なのでたとえばres.send(error)ができなかったりする
-  // そこでtry-catchを使う
   try {
     await newTask.save();
     res.send(201).send(req.body);
   } catch (e) {
     res.status(400).send(e);
   }
-  //   instead using below...
-  //   newTask
-  //     .save()
-  //     .then(() => {
-  //       res.status(201).send(newTask);
-  //     })
-  //     .catch((error) => {
-  //       res.status(400).send(error);
-  //     });
 });
 
 // ------------------------------------------------------
@@ -58,13 +45,6 @@ app.get("/users", async (req, res) => {
   } catch (e) {
     res.status(500).send(e);
   }
-  //   User.find({})
-  //     .then((users) => {
-  //       res.send(users);
-  //     })
-  //     .catch((error) => {
-  //       res.status(500).send(error);
-  //     });
 });
 
 app.get("/users/:id", async (req, res) => {
@@ -78,18 +58,6 @@ app.get("/users/:id", async (req, res) => {
   } catch (e) {
     res.status(500).send(e);
   }
-
-  //   User.findById(_id)
-  //     .then((user) => {
-  //       if (!user) {
-  //         return res.status(404).send();
-  //       }
-  //       res.send(user);
-  //     })
-  //     .catch((error) => {
-  //       res.status(500).send(error);
-  //     });
-  console.log(req.params);
 });
 
 app.get("/tasks", async (req, res) => {
@@ -99,13 +67,6 @@ app.get("/tasks", async (req, res) => {
   } catch (e) {
     res.status(500).send(e);
   }
-  //   Task.find({})
-  //     .then((tasks) => {
-  //       res.send(tasks);
-  //     })
-  //     .catch((error) => {
-  //       res.status(500).send(error);
-  //     });
 });
 
 app.get("/tasks/:id", async (req, res) => {
@@ -119,17 +80,6 @@ app.get("/tasks/:id", async (req, res) => {
   } catch (e) {
     res.status(500).send(e);
   }
-
-  //   Task.findById(_id)
-  //     .then((task) => {
-  //       if (!task) {
-  //         return res.status(404).send();
-  //       }
-  //       res.send(task);
-  //     })
-  //     .catch((error) => {
-  //       res.status(500).send(error);
-  //     });
 });
 
 app.listen(port, () => {

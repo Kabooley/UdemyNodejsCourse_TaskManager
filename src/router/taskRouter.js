@@ -1,16 +1,17 @@
 const express = require("express");
-const User = require("../model/user");
-const router = new express.Router();
+const Task = require("../model/task");
+const router = express.Router();
 
 // ------------------------------------------------------
 // POST
 // ------------------------------------------------------
 
-router.post("/users", async (req, res) => {
-  const newUser = new User(req.body);
+router.post("/tasks", async (req, res) => {
+  const newTask = new Task(req.body);
+
   try {
-    await newUser.save();
-    res.status(201).send(newUser);
+    await newTask.save();
+    res.send(201).send(newTask);
   } catch (e) {
     res.status(400).send(e);
   }
@@ -19,23 +20,24 @@ router.post("/users", async (req, res) => {
 // ------------------------------------------------------
 // GET
 // ------------------------------------------------------
-router.get("/users", async (req, res) => {
+
+router.get("/tasks", async (req, res) => {
   try {
-    const users = await User.find({});
-    res.send(users);
+    const tasks = await Task.find({});
+    res.send(tasks);
   } catch (e) {
     res.status(500).send(e);
   }
 });
 
-router.get("/users/:id", async (req, res) => {
+router.get("/tasks/:id", async (req, res) => {
   const _id = req.params.id;
   try {
-    const user = await User.findById(_id);
-    if (!user) {
-      return res.status(404).send();
+    const task = await Task.findById(_id);
+    if (!task) {
+      res.status(404).send();
     }
-    res.send(user);
+    res.send(task);
   } catch (e) {
     res.status(500).send(e);
   }
@@ -47,27 +49,27 @@ router.get("/users/:id", async (req, res) => {
 //
 // update user
 //
-router.patch("/users/:id", async (req, res) => {
-  // 既存のプロパティだけを更新できるように制限をかける
+
+router.patch("/tasks/:id", async (req, res) => {
+  const _id = req.params.id;
+  //
   const updates = Object.keys(req.body);
-  const allowedUpdates = ["name", "email", "password", "age"];
-  const isValidOperation = updates.every((update) =>
+  const allowedUpdates = ["description", "completed"];
+  const isInvalidOperation = updates.every((update) =>
     allowedUpdates.includes(update)
   );
-  if (!isValidOperation) {
+  if (!isInvalidOperation) {
     return res.status(400).send({ error: "Error: Invalid updates" });
   }
-
-  const _id = req.params.id;
   try {
-    const user = await User.findByIdAndUpdate(_id, req.body, {
+    const task = await Task.findByIdAndUpdate(_id, req.body, {
       new: true,
       runValidator: true,
     });
-    if (!user) {
-      return res.status(404).send("There's no user who has the id");
+    if (!task) {
+      return res.status(404).send("There's no task who has the id");
     }
-    res.send(user);
+    res.send(task);
   } catch (e) {
     res.status(500).send(e);
   }
@@ -77,13 +79,13 @@ router.patch("/users/:id", async (req, res) => {
 // DELETE
 //--------------------------------------------------------------
 
-router.delete("/users/:id", async (req, res) => {
+router.delete("/tasks/:id", async (req, res) => {
   try {
-    const user = await User.findByIdAndDelete(req.params.id);
-    if (!user) {
+    const task = await Task.findByIdAndDelete(req.params.id);
+    if (!task) {
       res.status(404).res("There's none who has the ID");
     }
-    res.send(user);
+    res.send(task);
   } catch (e) {
     res.status(500).send(e);
   }

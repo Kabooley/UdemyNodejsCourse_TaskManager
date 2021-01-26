@@ -62,10 +62,17 @@ router.patch("/tasks/:id", async (req, res) => {
     return res.status(400).send({ error: "Error: Invalid updates" });
   }
   try {
-    const task = await Task.findByIdAndUpdate(_id, req.body, {
-      new: true,
-      runValidator: true,
-    });
+    // const task = await Task.findByIdAndUpdate(_id, req.body, {
+    //   new: true,
+    //   runValidator: true,
+    // });
+
+	// TaskはModelであり、findById()はModel.findById()
+    const task = await Task.findById(req.params.id);
+	updates.forEach((update) => (task[update] = req.body[update]));
+	// save()はModel.save()
+    await task.save();
+
     if (!task) {
       return res.status(404).send("There's no task who has the id");
     }

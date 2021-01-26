@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
-
-const Task = mongoose.model("Task", {
+const taskSchema = mongoose.Schema({
   description: {
     type: String,
     required: true,
@@ -11,5 +10,15 @@ const Task = mongoose.model("Task", {
     default: false,
   },
 });
+
+taskSchema.pre("save", function (next) {
+  const task = this;
+  if (task.isModified("description")) {
+    console.log(task.description);
+  }
+  next();
+});
+// スキーマがモデルとして登録される
+const Task = mongoose.model("Task", taskSchema);
 
 module.exports = Task;

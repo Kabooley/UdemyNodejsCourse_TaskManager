@@ -45,3 +45,13 @@ await をつけると Promise オブジェクトが返されるまで待機す�
 
 async 関数は自身のなかで await を使用されるのを知っている関数である
 async 関数は Promise を返す
+
+
+
+## API Authentication and Security
+
+### パスワードはプレーンテキストで保存するな
+
+ - パスワードのハッシュ化:	bcrypt(npm package)
+ - ミドルウェアの使用: Mongoose Middleware 
+ - モデルのschema化: new mongoose.Schema()

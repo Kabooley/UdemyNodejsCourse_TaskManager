@@ -7,7 +7,21 @@ router.post("/users", async (req, res) => {
 
   try {
     await user.save();
-    res.status(201).send(user);
+    const token = await user.generateAuthToken();
+    res.status(201).send({user, token});
+  } catch (e) {
+    res.status(400).send(e);
+  }
+});
+
+router.post("/users/login", async (req, res) => {
+  try {
+    const user = await User.findByCredentials(
+      req.body.email,
+      req.body.password
+    );
+    const token = await user.generateAuthToken();
+    res.send({ user, token });
   } catch (e) {
     res.status(400).send(e);
   }
@@ -50,10 +64,14 @@ router.patch("/users/:id", async (req, res) => {
   }
 
   try {
-    // const user = await User.findByIdAndUpdate(req.params.id, req.body, {new: true,runValidators: true,});
+    // const user = await User.findByIdAndUpdate(_id, req.body, {
+    //   new: true,
+    //   runValidator: true,
+    // });
 
-    // Match for Dynamics
-    const user = await User.findById(req.body.id);
+    // findByIdAndUpdate()を使う代わりにmiddlewareのsaveを使うことで
+    // middleware機能を扱いやすくしておく
+    const user = await User.findById(req.params.id);
     updates.forEach((update) => (user[update] = req.body[update]));
     await user.save();
 
@@ -77,7 +95,7 @@ router.delete("/users/:id", async (req, res) => {
 
     res.send(user);
   } catch (e) {
-    res.status(500).send();
+    res.status(400).send(e);
   }
 });
 

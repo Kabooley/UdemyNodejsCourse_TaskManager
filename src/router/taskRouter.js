@@ -1,81 +1,100 @@
 const express = require("express");
 const Task = require("../model/task");
-const router = new express.Router();
+const router = express.Router();
+
+// ------------------------------------------------------
+// POST
+// ------------------------------------------------------
 
 router.post("/tasks", async (req, res) => {
-  const task = new Task(req.body);
+  const newTask = new Task(req.body);
 
   try {
-    await task.save();
-    res.status(201).send(task);
+    await newTask.save();
+    res.send(201).send(newTask);
   } catch (e) {
     res.status(400).send(e);
   }
 });
+
+// ------------------------------------------------------
+// GET
+// ------------------------------------------------------
 
 router.get("/tasks", async (req, res) => {
   try {
     const tasks = await Task.find({});
     res.send(tasks);
   } catch (e) {
-    res.status(500).send();
+    res.status(500).send(e);
   }
 });
 
 router.get("/tasks/:id", async (req, res) => {
   const _id = req.params.id;
-
   try {
     const task = await Task.findById(_id);
-
     if (!task) {
-      return res.status(404).send();
+      res.status(404).send();
     }
-
     res.send(task);
   } catch (e) {
-    res.status(500).send();
+    res.status(500).send(e);
   }
 });
+
+// -------------------------------------------------------------
+//  PATCH
+// -------------------------------------------------------------
+//
+// update user
+//
 
 router.patch("/tasks/:id", async (req, res) => {
+  const _id = req.params.id;
+  //
   const updates = Object.keys(req.body);
   const allowedUpdates = ["description", "completed"];
-  const isValidOperation = updates.every((update) =>
+  const isInvalidOperation = updates.every((update) =>
     allowedUpdates.includes(update)
   );
-
-  if (!isValidOperation) {
-    return res.status(400).send({ error: "Invalid updates!" });
+  if (!isInvalidOperation) {
+    return res.status(400).send({ error: "Error: Invalid updates" });
   }
-
   try {
-    const task = await Task.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    // const task = await Task.findByIdAndUpdate(_id, req.body, {
+    //   new: true,
+    //   runValidator: true,
+    // });
+
+	// TaskはModelであり、findById()はModel.findById()
+    const task = await Task.findById(req.params.id);
+	updates.forEach((update) => (task[update] = req.body[update]));
+	// save()はModel.save()
+    await task.save();
 
     if (!task) {
-      return res.status(404).send();
+      return res.status(404).send("There's no task who has the id");
     }
-
     res.send(task);
   } catch (e) {
-    res.status(400).send(e);
+    res.status(500).send(e);
   }
 });
+
+//--------------------------------------------------------------
+// DELETE
+//--------------------------------------------------------------
 
 router.delete("/tasks/:id", async (req, res) => {
   try {
     const task = await Task.findByIdAndDelete(req.params.id);
-
     if (!task) {
-      res.status(404).send();
+      res.status(404).res("There's none who has the ID");
     }
-
     res.send(task);
   } catch (e) {
-    res.status(500).send();
+    res.status(500).send(e);
   }
 });
 

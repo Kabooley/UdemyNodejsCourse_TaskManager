@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 
-const User = mongoose.model("User", {
+const userSchema = mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -39,5 +39,17 @@ const User = mongoose.model("User", {
     },
   },
 });
+
+// MIDDLEWARE
+// To bind "this", DON'T USE ARROW FUNCTION
+// 
+// postmanでCreate Userしたときにミドルウェアとして機能する
+userSchema.pre("save", async function (next) {
+  const user = this;
+  console.log("just before save user");
+  console.log(user);
+  next();
+});
+const User = mongoose.model("User", userSchema);
 
 module.exports = User;

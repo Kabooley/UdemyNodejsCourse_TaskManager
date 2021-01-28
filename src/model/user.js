@@ -50,10 +50,19 @@ const userSchema = new mongoose.Schema({
   ],
 });
 
+// jwt.sign(payload, secretOrPrivateKey, [options, callback])
+//
+// payload: オブジェクトリテラル
+// secretOrPublicKey: HMACアルゴリズムのシークレット、
+// 	またはRSAとECDSAのPEMエンコード秘密キーのいずれかを含む文字列、バッファー、またはオブジェクト
+// 	要は"thisismynewcourse"は秘密鍵である
 userSchema.methods.generateAuthToken = async function () {
   const user = this;
   const token = jwt.sign({ _id: user._id.toString() }, "thisismynewcourse");
 
+  //   新規の配列の生成:  concatは2つ以上の配列を結合するために使用する
+  // userの配列の末尾にtokenの配列のメンバが追加されるということ
+  // つまりuser.tokensという新規のメンバを作成してその値をtokenにするということ
   user.tokens = user.tokens.concat({ token });
   await user.save();
 

@@ -191,3 +191,25 @@ model にトークンメンバを追加する
 ぶっちゃけ講義ではトークンの認証について同実装すべきかは教えられなかった
 
 #### Express の middleware
+
+```JavaScript
+const app = express()
+app.use((req, res, next) => {
+	console.log('this is middleware')
+	next()
+})
+```
+引数が３つでミドルウェアとみなされる
+
+```JavaScript
+const middleware = (req, res, next) => {next()}
+router.get("/users", middleware, (req, res) => {
+})
+```
+app.get()は引数に複数のcallback関数を取ることができるので
+ここにミドルウェアを置くことができる
+ミドルウェアはnext()を実行することが前提になるので
+最終的なコールバック関数でないコールバック関数は、
+next()を使用していればミドルウェアとみなす
+
+
